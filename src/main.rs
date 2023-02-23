@@ -1,4 +1,6 @@
-use serde_json::{Number, Value};
+use std::thread::current;
+
+use serde_json::{Number, Value, from_value, from_str};
 
 struct Stack {
     stack: Vec<String>,
@@ -14,6 +16,10 @@ impl Stack {
     fn push<'a>(&mut self, value: String) {
         self.stack.push(value);
     }
+}
+
+fn print_type_of<T>(_: &T) {
+    println!("{}", std::any::type_name::<T>())
 }
 fn main() {
     let mut json_file = {
@@ -39,19 +45,18 @@ fn main() {
         process_opcode(instruction_array[i], instruction_array[i+1], &mut stack)
     }
 
-    let vec = &json_file.as_array().unwrap()[2]["expect"]["stack"];
+    let expected_stack_vector = &json_file.as_array().unwrap()[2]["expect"]["stack"];
+    let mut expected_stack = expected_stack_vector.get(0).unwrap().clone();
+    let expected_stack = from_value::<String>(expected_stack).unwrap();
+    let expected_stack = &expected_stack[2..];
+    println!("Expected Stack is {expected_stack}");
 
-    serde_json::value
-    println!("The vec is {:?}", vec);
+    let binding = stack.stack[0].clone();
+    let current_stack = binding.as_str();
+    let current_stack = current_stack;
 
-
-    // let current_stack = stack.stack;
-
-    // println!("The current stack is {:?}", current_stack);
-
-    // assert_eq!(current_stack, stack);
-
-    // println!("The stack is {:?}", stack.stack);
+    println!("The current stack is {current_stack}");
+    assert_eq!(current_stack, expected_stack);
 
 }
 
