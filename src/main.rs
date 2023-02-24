@@ -13,7 +13,7 @@ impl Stack {
         }
     }
 
-    fn push<'a>(&mut self, value: String) {
+    fn push(&mut self, value: String) {
         self.stack.push(value);
     }
 }
@@ -36,41 +36,61 @@ fn main() {
 
     let mut stack = Stack::new();
 
-    let instruction_to_process = 0;
-
-    let instruction = json_file.as_array().unwrap()[instruction_to_process]["code"]["asm"].as_str().unwrap();
-    let instruction_array = instruction.split_whitespace().collect::<Vec<&str>>();
-    println!("The instruction is {:?}", instruction_array);
-
-    for i in (0..instruction_array.len()).step_by(2) {
-        println!("I is {i}");
-        process_opcode(instruction_array[i], instruction_array[i+1], &mut stack)
-    }
-
-    let expected_stack_vector = &json_file.as_array().unwrap()[instruction_to_process]["expect"]["stack"];
-    let expected_stack = expected_stack_vector.get(0).unwrap().clone();
-    let expected_stack = &from_value::<String>(expected_stack).unwrap()[2..];
-    println!("Expected Stack is {expected_stack}");
-
-    let binding = &stack.stack[0];
-    let current_stack = binding.as_str();
-    let current_stack = current_stack;
-
-    println!("The current stack is {current_stack}");
-    assert_eq!(current_stack, expected_stack);
+    let start_index = 2;
+    let end_index = 9; // end index is exclusive
+    loop_through_test_cases(start_index, end_index, json_file, &mut stack)
 
 }
 
 
-fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Value) {
+fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Value, stack: &mut Stack) {
 
     for instruction_index in start_index..end_index {
+        // retrieve the instruction from the json file at the index of instruction_index
         let instruction = json_file.as_array().unwrap()[instruction_index]["code"]["asm"].as_str().unwrap();
+        let instruction_array = instruction.split_whitespace().collect::<Vec<&str>>();
+        println!("The instruction is {:?}", instruction_array);
+    
+        // loop through the instruction array and process the opcodes. Increment by two because the opcodes and their values are in pairs
+        for i in (0..instruction_array.len()).step_by(2) {
+            let opcode = instruction_array[i];
 
+            if (opcode == "STOP") {
+                break;
+            }
+
+            let value = instruction_array[i+1];
+            
+            process_opcode(opcode, value, stack);
+        }
+    
+        // retrieve the stack value from the json file
+        let expected_stack = &json_file.as_array().unwrap()[instruction_index]["expect"]["stack"];
+        let expected_stack_vector = expected_stack.as_array().unwrap();
+
+
+         // Define a closure to square each element
+        let convert_to_string: fn(&Value) -> String  = |x| String::from(&from_value::<String>(x.clone()).unwrap()[2..]);
+
+         // Call the `map` function on the vector, passing the closure
+        let transformed_vec = expected_stack_vector.iter().map(convert_to_string).collect::<Vec<_>>();
+
+        println!("The transformed vector is {:?}", transformed_vec);
+
+        // check stacks are equal
+        assert_eq!(transformed_vec.iter().eq(stack.stack.iter().rev()), true);
+
+        // reset stack
+        *stack = Stack::new();
     }
- }
+}
+ 
 
-
+fn loop_stack(stack: &mut Stack) {
+    for i in 0..stack.stack.len() {
+        println!("The stack is {:?}", stack.stack[i]);
+    }
+}
 
 fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) {
     match opcode {
@@ -96,6 +116,16 @@ fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) {
             stack.push(value);
         },
         "PUSH10" => {
+            let value = String::from(&value[2..]);
+            println!("We are pushing to the stack {value}");
+            stack.push(value);
+        },
+        "PUSH11" => {
+            let value = String::from(&value[2..]);
+            println!("We are pushing to the stack {value}");
+            stack.push(value);
+        },
+        "PUSH32" => {
             let value = String::from(&value[2..]);
             println!("We are pushing to the stack {value}");
             stack.push(value);
