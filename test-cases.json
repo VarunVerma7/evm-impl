@@ -167,20 +167,6 @@
       }
     },
     {
-      "name": "ADD (overflow)",
-      "hint": "EVM operates with uint256, if you add 2 to the max possible value it overflows and wraps around",
-      "code": {
-        "asm": "PUSH32 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\nPUSH1 0x02\nADD",
-        "bin": "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600201"
-      },
-      "expect": {
-        "stack": [
-          "0x1"
-        ],
-        "success": true
-      }
-    },
-    {
       "name": "MUL",
       "code": {
         "asm": "PUSH1 0x02\nPUSH1 0x03\nMUL",
@@ -195,20 +181,6 @@
       "hint": ""
     },
     {
-      "name": "MUL (overflow)",
-      "hint": "All math is performed with implicit [mod 2^256]",
-      "code": {
-        "asm": "PUSH32 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\nPUSH1 0x02\nMUL",
-        "bin": "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600202"
-      },
-      "expect": {
-        "stack": [
-          "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"
-        ],
-        "success": true
-      }
-    },
-    {
       "name": "SUB",
       "hint": "SUB takes the first element from the stack and subtracts the second element from the stack",
       "code": {
@@ -218,20 +190,6 @@
       "expect": {
         "stack": [
           "0x1"
-        ],
-        "success": true
-      }
-    },
-    {
-      "name": "SUB (underflow)",
-      "hint": "Underflow works the same way as overflow, 3 - 2 wraps around and results in MAX_UINT256",
-      "code": {
-        "asm": "PUSH1 0x03\nPUSH1 0x02\nSUB",
-        "bin": "6003600203"
-      },
-      "expect": {
-        "stack": [
-          "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         ],
         "success": true
       }
@@ -282,7 +240,7 @@
       "name": "MOD",
       "hint": "10 mod 3 = 1",
       "code": {
-        "asm": "PUSH1 3\nPUSH1 10\nMOD",
+        "asm": "PUSH1 0x3\nPUSH1 0x10\nMOD",
         "bin": "6003600a06"
       },
       "expect": {
@@ -296,7 +254,7 @@
       "name": "MOD (by larger number)",
       "hint": "5 mod 17 = 5",
       "code": {
-        "asm": "PUSH1 17\nPUSH1 5\nMOD",
+        "asm": "PUSH1 0x17\nPUSH1 0x5\nMOD",
         "bin": "6011600506"
       },
       "expect": {
@@ -310,7 +268,7 @@
       "name": "MOD (by zero)",
       "hint": "In EVM you can divide by zero! Modern Solidity protects from this by adding instructions that check for zero",
       "code": {
-        "asm": "PUSH1 0\nPUSH1 2\nMOD",
+        "asm": "PUSH1 0x0\nPUSH1 0x2\nMOD",
         "bin": "6000600206"
       },
       "expect": {

@@ -40,8 +40,8 @@ fn main() {
 
     let mut stack = Stack::new();
 
-    let start_index = 12;
-    let end_index = 13; // end index is exclusive
+    let start_index = 17;
+    let end_index = 21; // end index is exclusive
     loop_through_test_cases(start_index, end_index, json_file, &mut stack)
 
 }
@@ -68,11 +68,15 @@ fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Valu
             if !should_continue { // handle STOP opcode case
                 break;
             }
+            println!("After should_continue");
             
             // index increment is based off the opcode
             if opcode.starts_with("PUSH") {
+                println!("Incrementing by 2");
                 i += 2;
             } else {
+                println!("Incrementing by 1");
+
                 i += 1;
             }
         }
@@ -146,19 +150,92 @@ fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) -> bool {
             let val1: String = stack.pop();
             let val2: String = stack.pop();
     
-            let val1 = u128::from_str_radix(&val1, 16).unwrap_or_default();
-            let val2 = u128::from_str_radix(&val2, 16).unwrap_or_default();
+            let val1 = u32::from_str_radix(&val1, 16).unwrap_or_default();
+            let val2 = u32::from_str_radix(&val2, 16).unwrap();
 
-            println!("Val 1 is {val1}");
-            println!("Val 2 is {val2}");
+            let wrapping_add_val = val1.wrapping_add(val2).to_string();
+            let added = String::from(wrapping_add_val);
 
-            // let wrapping_add_val = ((val1 + val2) % 2u128.pow(32)).to_string();
-            // println!("The wrapping add val is {wrapping_add_val}", wrapping_add_val = wrapping_add_val);
-            // let added = String::from(wrapping_add_val);
-
-            // stack.push(added);
+            stack.push(added);
 
         },
+        "MUL" => {
+            let val1: String = stack.pop();
+            let val2: String = stack.pop();
+    
+            let val1 = u32::from_str_radix(&val1, 16).unwrap_or_default();
+            let val2 = u32::from_str_radix(&val2, 16).unwrap();
+
+            let wrapping_add_val = val1.wrapping_mul(val2).to_string();
+            let added = String::from(wrapping_add_val);
+
+            stack.push(added);
+
+        },
+        "SUB" => {
+            let val1: String = stack.pop();
+            let val2: String = stack.pop();
+    
+            let val1 = u32::from_str_radix(&val1, 16).unwrap_or_default();
+            let val2 = u32::from_str_radix(&val2, 16).unwrap();
+
+            let wrapping_add_val = val1.wrapping_sub(val2).to_string();
+            let added = String::from(wrapping_add_val);
+
+            stack.push(added);
+
+        },
+        "DIV" => {
+            let val1: String = stack.pop();
+            let val2: String = stack.pop();
+    
+            let val1 = u32::from_str_radix(&val1, 16).unwrap_or_default();
+            let val2 = u32::from_str_radix(&val2, 16).unwrap();
+
+            if (val2 == 0) {
+                stack.push(String::from("0"));
+                return true;
+            }
+
+            let wrapping_add_val = val1.wrapping_div(val2).to_string();
+            let added = String::from(wrapping_add_val);
+
+            stack.push(added);
+
+        },
+        "MOD" => {
+            let val1: String = stack.pop();
+            let val2: String = stack.pop();
+    
+            let val1 = u32::from_str_radix(&val1, 16).unwrap_or_default();
+            let val2 = u32::from_str_radix(&val2, 16).unwrap();
+            if (val2 == 0) {
+                stack.push(String::from("0"));
+                return true;
+            }
+
+            let wrapping_add_val = (val1 % val2).to_string();
+            let added = String::from(wrapping_add_val);
+
+            stack.push(added);
+
+        },
+        "ADDMOD" => {
+            let val1: String = stack.pop();
+            let val2: String = stack.pop();
+    
+            let val1 = u32::from_str_radix(&val1, 16).unwrap_or_default();
+            let val2 = u32::from_str_radix(&val2, 16).unwrap();
+            if (val2 == 0) {
+                stack.push(String::from("0"));
+                return true;
+            }
+
+            let wrapping_add_val = (val1 % val2).to_string();
+            let added = String::from(wrapping_add_val);
+
+            stack.push(added);
+        }
         _ => {
             println!("No opcodes matched, opcode we got was {opcode}")
         }
