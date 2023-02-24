@@ -40,8 +40,8 @@ fn main() {
 
     let mut stack = Stack::new();
 
-    let start_index = 0;
-    let end_index = 12; // end index is exclusive
+    let start_index = 12;
+    let end_index = 13; // end index is exclusive
     loop_through_test_cases(start_index, end_index, json_file, &mut stack)
 
 }
@@ -96,6 +96,9 @@ fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Valu
         // check stacks are equal
         assert_eq!(transformed_vec.iter().eq(stack.stack.iter().rev()), true);
 
+        // stacks equal
+        println!("Stacks are equal!");
+
         // reset stack
         *stack = Stack::new();
     }
@@ -140,10 +143,20 @@ fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) -> bool {
             stack.pop();
         },
         "ADD" => {
-            let val1: usize = stack.pop().parse().unwrap();
-            let val2: usize = stack.pop().parse().unwrap();
-            let added = (val1 + val2).to_string();
-            stack.push(added);
+            let val1: String = stack.pop();
+            let val2: String = stack.pop();
+    
+            let val1 = u128::from_str_radix(&val1, 16).unwrap_or_default();
+            let val2 = u128::from_str_radix(&val2, 16).unwrap_or_default();
+
+            println!("Val 1 is {val1}");
+            println!("Val 2 is {val2}");
+
+            // let wrapping_add_val = ((val1 + val2) % 2u128.pow(32)).to_string();
+            // println!("The wrapping add val is {wrapping_add_val}", wrapping_add_val = wrapping_add_val);
+            // let added = String::from(wrapping_add_val);
+
+            // stack.push(added);
 
         },
         _ => {
