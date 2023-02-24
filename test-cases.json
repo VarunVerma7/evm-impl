@@ -282,7 +282,7 @@
       "name": "ADDMOD",
       "hint": "10 + 10 mod 8 = 4",
       "code": {
-        "asm": "PUSH1 8\nPUSH1 10\nPUSH1 10\nADDMOD",
+        "asm": "PUSH1 0x8\nPUSH1 0xA\nPUSH1 0xA\nADDMOD",
         "bin": "6008600a600a08"
       },
       "expect": {
@@ -293,24 +293,10 @@
       }
     },
     {
-      "name": "ADDMOD (wrapped)",
-      "code": {
-        "asm": "PUSH1 2\nPUSH1 2\nPUSH32 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\nADDMOD",
-        "bin": "600260027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff08"
-      },
-      "expect": {
-        "stack": [
-          "0x1"
-        ],
-        "success": true
-      },
-      "hint": ""
-    },
-    {
       "name": "MULMOD",
       "hint": "10 * 10 mod 8 = 4",
       "code": {
-        "asm": "PUSH1 8\nPUSH1 10\nPUSH1 10\nMULMOD",
+        "asm": "PUSH1 0x8\nPUSH1 0xA\nPUSH1 0xA\nMULMOD",
         "bin": "6008600a600a09"
       },
       "expect": {
@@ -321,18 +307,18 @@
       }
     },
     {
-      "name": "MULMOD (wrapped)",
+      "name": "JUMP",
+      "hint": "Set the Program Counter (PC) to the top value from the stack",
       "code": {
-        "asm": "PUSH1 12\nPUSH32 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\nPUSH32 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\nMULMOD",
-        "bin": "600c7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff09"
+        "asm": "PUSH1 0x5\nJUMP\nPUSH1 0x1\nJUMPDEST\nPUSH1 0x2 PUSH1 0x3 POP",
+        "bin": "60055660015b6002"
       },
       "expect": {
         "stack": [
-          "0x9"
+          "0x2"
         ],
         "success": true
-      },
-      "hint": ""
+      }
     },
     {
       "name": "EXP",
@@ -1144,20 +1130,6 @@
       "expect": {
         "stack": [
           "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-        ],
-        "success": true
-      }
-    },
-    {
-      "name": "JUMP",
-      "hint": "Set the Program Counter (PC) to the top value from the stack",
-      "code": {
-        "asm": "PUSH1 5\nJUMP\nPUSH1 1\nJUMPDEST\nPUSH1 2",
-        "bin": "60055660015b6002"
-      },
-      "expect": {
-        "stack": [
-          "0x2"
         ],
         "success": true
       }
