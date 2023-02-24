@@ -142,7 +142,7 @@
       "name": "STOP (midway)",
       "hint": "Note that the `PUSH1 2` didn't execute because the program stops after STOP opcode",
       "code": {
-        "asm": "PUSH1 1\nSTOP\nPUSH1 2",
+        "asm": "PUSH1 0x1\nSTOP\nPUSH1 0x2",
         "bin": "6001006002"
       },
       "expect": {

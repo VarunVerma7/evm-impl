@@ -17,8 +17,8 @@ impl Stack {
         self.stack.push(value);
     }
 
-    fn pop(&mut self) {
-        self.stack.pop();
+    fn pop(&mut self) -> String {
+        self.stack.pop().unwrap()
     }
 }
 
@@ -40,8 +40,8 @@ fn main() {
 
     let mut stack = Stack::new();
 
-    let start_index = 2;
-    let end_index = 10; // end index is exclusive
+    let start_index = 0;
+    let end_index = 12; // end index is exclusive
     loop_through_test_cases(start_index, end_index, json_file, &mut stack)
 
 }
@@ -55,12 +55,28 @@ fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Valu
         println!("The instruction is {:?}", instruction_array);
     
         // loop through the instruction array and process the opcodes. Increment by two because the opcodes and their values are in pairs
-        for i in (0..instruction_array.len()).step_by(2) {
-            let opcode = instruction_array[i];
-            let value = instruction_array[i+1];
+        let mut i = 0;
+        while (i < instruction_array.len()) {
+            let opcode = *instruction_array.get(i ).unwrap_or(&"");
+            let value = *instruction_array.get(i + 1).unwrap_or(&""); // could be out of bounds
+
+            println!("Processing opcode {opcode} with value {value}", opcode = opcode, value = value);
+        
+
+            let should_continue = process_opcode(opcode, value, stack); // so far everything but stop opcode is true
+
+            if !should_continue { // handle STOP opcode case
+                break;
+            }
             
-            process_opcode(opcode, value, stack);
+            // index increment is based off the opcode
+            if opcode.starts_with("PUSH") {
+                i += 2;
+            } else {
+                i += 1;
+            }
         }
+      
     
         // retrieve the stack value from the json file
         let expected_stack = &json_file.as_array().unwrap()[instruction_index]["expect"]["stack"];
@@ -73,7 +89,9 @@ fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Valu
          // Call the `map` function on the vector, passing the closure
         let transformed_vec = expected_stack_vector.iter().map(convert_to_string).collect::<Vec<_>>();
 
-        println!("The transformed vector is {:?}", transformed_vec);
+        // expected stack is in reverse order and transformed_vec is in correct order, for debugging purposes
+        println!("The expected stack is {:?}", transformed_vec);
+        println!("The actual stack is {:?}", stack.stack.iter().rev().collect::<Vec<_>>());
 
         // check stacks are equal
         assert_eq!(transformed_vec.iter().eq(stack.stack.iter().rev()), true);
@@ -84,10 +102,11 @@ fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Valu
 }
  
 
-fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) {
+fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) -> bool {
     match opcode {
         "STOP" => {
             println!("We are stopping");
+            return false;
         },
         "PUSH1" => {
             let value = String::from(&value[2..]);
@@ -99,34 +118,37 @@ fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) {
         },    
         "PUSH4" => {
             let value = String::from(&value[2..]);
-            println!("We are pushing to the stack {value}");
             stack.push(value);
         },
         "PUSH6" => {
             let value = String::from(&value[2..]);
-            println!("We are pushing to the stack {value}");
             stack.push(value);
         },
         "PUSH10" => {
             let value = String::from(&value[2..]);
-            println!("We are pushing to the stack {value}");
             stack.push(value);
         },
         "PUSH11" => {
             let value = String::from(&value[2..]);
-            println!("We are pushing to the stack {value}");
             stack.push(value);
         },
         "PUSH32" => {
             let value = String::from(&value[2..]);
-            println!("We are pushing to the stack {value}");
             stack.push(value);
         },
         "POP" => {
             stack.pop();
         },
+        "ADD" => {
+            let val1: usize = stack.pop().parse().unwrap();
+            let val2: usize = stack.pop().parse().unwrap();
+            let added = (val1 + val2).to_string();
+            stack.push(added);
+
+        },
         _ => {
-            println!("No opcodes matched")
+            println!("No opcodes matched, opcode we got was {opcode}")
         }
     };
+    return true;
 }
