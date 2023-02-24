@@ -16,6 +16,10 @@ impl Stack {
     fn push(&mut self, value: String) {
         self.stack.push(value);
     }
+
+    fn pop(&mut self) {
+        self.stack.pop();
+    }
 }
 
 fn print_type_of<T>(_: &T) {
@@ -37,11 +41,10 @@ fn main() {
     let mut stack = Stack::new();
 
     let start_index = 2;
-    let end_index = 9; // end index is exclusive
+    let end_index = 10; // end index is exclusive
     loop_through_test_cases(start_index, end_index, json_file, &mut stack)
 
 }
-
 
 fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Value, stack: &mut Stack) {
 
@@ -54,11 +57,6 @@ fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Valu
         // loop through the instruction array and process the opcodes. Increment by two because the opcodes and their values are in pairs
         for i in (0..instruction_array.len()).step_by(2) {
             let opcode = instruction_array[i];
-
-            if (opcode == "STOP") {
-                break;
-            }
-
             let value = instruction_array[i+1];
             
             process_opcode(opcode, value, stack);
@@ -85,12 +83,6 @@ fn loop_through_test_cases(start_index: usize, end_index: usize, json_file: Valu
     }
 }
  
-
-fn loop_stack(stack: &mut Stack) {
-    for i in 0..stack.stack.len() {
-        println!("The stack is {:?}", stack.stack[i]);
-    }
-}
 
 fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) {
     match opcode {
@@ -129,6 +121,9 @@ fn process_opcode(opcode: &str, value: &str, stack: &mut Stack) {
             let value = String::from(&value[2..]);
             println!("We are pushing to the stack {value}");
             stack.push(value);
+        },
+        "POP" => {
+            stack.pop();
         },
         _ => {
             println!("No opcodes matched")
